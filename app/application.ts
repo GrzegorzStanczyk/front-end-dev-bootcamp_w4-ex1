@@ -236,7 +236,14 @@ class Paddle extends Sprite {
 }
 
 class Brick extends Sprite {
+    livesLeft: number = 1;
+}
 
+class HardBrick extends Sprite {
+    livesLeft: number = 2;
+    markHit() {
+        this.sprite.classList.add('hit');
+    }
 }
 
 enum GameState {
@@ -277,7 +284,11 @@ class Game {
         );
 
         for (let i = 0; i < bricks.length; i++) {
-            this.bricks.push(new Brick(<HTMLElement>bricks[i]));
+            if (bricks[i].classList.contains('hardbrick')) {
+                this.bricks.push(new HardBrick(<HTMLElement>bricks[i]));
+            } else {
+                this.bricks.push(new Brick(<HTMLElement>bricks[i]));
+            }
         }
 
         this.createWalls(this.ball.radius, boardElement.offsetWidth, boardElement.offsetHeight);
@@ -370,7 +381,11 @@ class Game {
                 }
 
                 if (wasHit) {
-                    brick.hide();
+                    if (--brick.livesLeft < 1) {
+                        brick.hide();
+                    } else {
+                        brick.markHit();
+                    }
                     this.score += 20;
                     this.scoreLabel.innerText = '' + this.score;
                     break;
