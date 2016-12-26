@@ -237,12 +237,24 @@ class Paddle extends Sprite {
 
 class Brick extends Sprite {
     livesLeft: number = 1;
+
+    wasHit(): boolean {
+        return --this.livesLeft < 1;
+    }
+
+    markHit() {}
 }
 
-class HardBrick extends Sprite {
+class HardBrick extends Brick {
     livesLeft: number = 2;
     markHit() {
         this.sprite.classList.add('hit');
+    }
+}
+
+class ImmortalBrick extends HardBrick {
+    wasHit(): boolean {
+        return false;
     }
 }
 
@@ -286,6 +298,8 @@ class Game {
         for (let i = 0; i < bricks.length; i++) {
             if (bricks[i].classList.contains('hardbrick')) {
                 this.bricks.push(new HardBrick(<HTMLElement>bricks[i]));
+            } else if (bricks[i].classList.contains('immortal')) {
+                this.bricks.push(new ImmortalBrick(<HTMLElement>bricks[i]));
             } else {
                 this.bricks.push(new Brick(<HTMLElement>bricks[i]));
             }
@@ -381,7 +395,7 @@ class Game {
                 }
 
                 if (wasHit) {
-                    if (--brick.livesLeft < 1) {
+                    if (brick.wasHit()) {
                         brick.hide();
                     } else {
                         brick.markHit();
@@ -410,7 +424,7 @@ var game = new Game(
     <HTMLElement>document.getElementsByClassName("game-board")[0],
     <HTMLElement>document.getElementById('lives'),
     <HTMLElement>document.getElementById('score'),
-    <HTMLElement>document.getElementById('newGame')    
+    <HTMLElement>document.getElementById('newGame')
 );
 
 game.run();
